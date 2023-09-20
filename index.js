@@ -10,6 +10,7 @@ if (savedURLs.length) {
             </div>
         </div>`;
     document.querySelector('#saved').innerHTML = savedURLs.map(item => '<div>' + item.substring(0, 35) + '...</div>').join('');
+
 } else {
     document.querySelector('#saved-links-row').innerHTML = `<h5 class="text-center">You haven't saved anything yet...</h5>`;
 }
@@ -18,34 +19,31 @@ document.querySelector('#add-current-page-button').addEventListener('click', asy
     let currentURL = (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0].url;
 
     if (savedURLs.includes(currentURL)) {
-        const warning = document.createElement('p');
-        warning.innerHTML = 'You already saved this page. Continue?';
+        const warning = document.querySelector('#warning');
+        const warningHTML = `
+            <p class="lead">You already saved this page. Continue?</p>
+            <button id="yes-button" class="btn btn-success">Yes</button>
+            <button id="no-button" class="btn btn-danger">No</button>`;
 
-        const yesButton = document.createElement('button');
-        yesButton.innerHTML = 'Yes';
-        yesButton.classList.add('btn', 'btn-success');
-        yesButton.addEventListener('click', () => {
+        warning.innerHTML = warningHTML;
+        warning.classList.add('mt-3');
+
+        document.querySelector('#yes-button').addEventListener('click', () => {
             savedURLs.push(currentURL);
 
             chrome.storage.sync.set({ savedURLs });
 
             document.querySelector('#saved').innerHTML = savedURLs.map(item => '<div>' + item.substring(0, 35) + '...</div>').join('');
 
-            warning.remove();
-            yesButton.remove();
-            noButton.remove();
+            warning.innerHTML = '';
+            warning.classList.remove('mt-3');
         });
 
-        const noButton = document.createElement('button');
-        noButton.innerHTML = 'No';
-        noButton.classList.add('btn', 'btn-danger');
-        noButton.addEventListener('click', () => {
-            warning.remove();
-            yesButton.remove();
-            noButton.remove();
+        document.querySelector('#no-button').addEventListener('click', () => {
+            warning.innerHTML = '';
+            warning.classList.remove('mt-3');
         });
 
-        document.querySelector('#confirm').append(warning, yesButton, noButton);
     } else {
         // Check if there is an element with saved items
         if (!document.querySelector('#saved')) {
@@ -53,7 +51,7 @@ document.querySelector('#add-current-page-button').addEventListener('click', asy
             <h2>Your saved links</h2>
             <div class="col bg-body-secondary rounded-4 overflow-hidden">
                 <div class="row overflow-y-auto overflow-x-hidden" style="height: 10rem;">
-                    <div class="col" id="saved"></div>
+                    <div id="saved" class="col"></div>
                 </div>
             </div>`;
         }
