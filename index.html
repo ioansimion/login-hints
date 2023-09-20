@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Hints</title>
+    <link rel="stylesheet" href="bootstrap-5.3.2-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="container text-white bg-info">
+        <div class="row pt-3">
+            <h2 class="display-1 text-center">Login Hints</h2>
+        </div>
+
+        <div class="row my-3">
+            <div class="col d-flex justify-content-center">
+                <button class="btn btn-lg btn-outline-light custom-button" id="add-current-page-button">
+                    Add this page
+                </button>
+                <div id="confirm"></div>
+            </div>
+        </div>
+
+        <div class="row p-3 pt-5 text-black bg-white rounded-circle rounded-bottom-0" id="saved-links-row">
+            <h2>Your saved links</h2>
+            <div class="col bg-body-secondary rounded-4 overflow-hidden">
+                <div class="row overflow-y-auto overflow-x-hidden" style="height: 10rem;">
+                    <div class="col" id="saved"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="index.js" type="module"></script>
+    <script src="bootstrap-5.3.2-dist/js/bootstrap.js"></script>
+</body>
+
+</html>

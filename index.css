@@ -1,0 +1,21 @@
+div::-webkit-scrollbar {
+    width: var(--bs-border-radius-xl);
+}
+
+div::-webkit-scrollbar-track {
+    background-color: var(--bs-dark-bg-subtle);
+}
+
+div::-webkit-scrollbar-thumb {
+    background-color: var(--bs-tertiary-bg);
+    border: 2px solid var(--bs-dark-bg-subtle);
+    border-radius: 0 var(--bs-border-radius-xl) var(--bs-border-radius-xl) 0;
+}
+
+body {
+    width: 25rem;
+}
+
+.custom-button:hover {
+    color: var(--bs-info);
+}

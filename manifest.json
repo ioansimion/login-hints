@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Login Hints",
+    "version": "1.0",
+    "description": "This is my first Chrome extension.",
+    "author": "ioansimion",
+    "action": {
+        "default_popup": "index.html",
+        "default_title": "Login Hints"
+    },
+    "background": {
+        "service_worker": "service-worker.js"
+    },
+    "permissions": [
+        "contextMenus",
+        "storage",
+        "tabs"
+    ]
+}
