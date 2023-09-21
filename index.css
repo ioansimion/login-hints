@@ -8,7 +8,9 @@ div::-webkit-scrollbar-track {
 
 div::-webkit-scrollbar-thumb {
     background-color: var(--bs-tertiary-bg);
-    border: 2px solid var(--bs-dark-bg-subtle);
+    border-width: 1px 2px;
+    border-style: solid;
+    border-color: var(--bs-dark-bg-subtle);
     border-radius: 0 var(--bs-border-radius-xl) var(--bs-border-radius-xl) 0;
 }
 

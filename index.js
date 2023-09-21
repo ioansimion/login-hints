@@ -1,24 +1,41 @@
-let savedURLs = (await chrome.storage.sync.get('savedURLs')).savedURLs || [];
+let hints = (await chrome.storage.sync.get('hints')).hints || [];
+let currentURL = new URL((await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0].url).hostname;
 
-// Populate with saved items
-if (savedURLs.length) {
-    document.querySelector('#saved-links-row').innerHTML = `
-        <h2>Your saved links</h2>
-        <div class="col bg-body-secondary rounded-4 overflow-hidden">
-            <div class="row overflow-y-auto overflow-x-hidden" style="height: 10rem;">
-                <div class="col" id="saved"></div>
-            </div>
-        </div>`;
-    document.querySelector('#saved').innerHTML = savedURLs.map(item => '<div>' + item.substring(0, 35) + '...</div>').join('');
+function updateSaved() {
+    const savedHints = document.querySelector('#saved-hints');
 
-} else {
-    document.querySelector('#saved-links-row').innerHTML = `<h5 class="text-center">You haven't saved anything yet...</h5>`;
+    if (hints.length) {
+        // If there are hints, display them
+        savedHints.innerHTML = `
+            <h2>Your saved hints</h2>
+            <div class="col bg-body-secondary rounded-4 overflow-hidden">
+                <div class="row overflow-y-auto overflow-x-hidden" style="height: 10rem;">
+                    <div class="col">
+                        ${hints.map(item => `<div>${item.domain + ' > ' + item.hint}</div>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+    } else {
+        // Else display a message
+        savedHints.innerHTML = `<h5 class="text-center">You haven't saved anything yet...</h5>`;
+    }
 }
 
-document.querySelector('#add-current-page-button').addEventListener('click', async () => {
-    let currentURL = (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0].url;
+function createHint(domain, hint) {
+    hints.push({ domain, hint });
+    chrome.storage.sync.set({ hints });
+    updateSaved();
+}
 
-    if (savedURLs.includes(currentURL)) {
+document.querySelector('#add-current-page-button').addEventListener('click', () => {
+    // This function has to:
+    // Check if a url is in the object list
+    // If true, then display a warning message with two options
+    // Option 1: Proceed with creating a new entry in the storage
+    // Option 2: Cancel everything
+    // If false, then: Proceed with creating a new entry in the storage
+    if (hints.includes(currentURL)) {
+        // Item already exists
         const warning = document.querySelector('#warning');
         const warningHTML = `
             <p class="lead">You already saved this page. Continue?</p>
@@ -29,11 +46,7 @@ document.querySelector('#add-current-page-button').addEventListener('click', asy
         warning.classList.add('mt-3');
 
         document.querySelector('#yes-button').addEventListener('click', () => {
-            savedURLs.push(currentURL);
-
-            chrome.storage.sync.set({ savedURLs });
-
-            document.querySelector('#saved').innerHTML = savedURLs.map(item => '<div>' + item.substring(0, 35) + '...</div>').join('');
+            createHint(currentURL, hintInput.value);
 
             warning.innerHTML = '';
             warning.classList.remove('mt-3');
@@ -45,21 +58,23 @@ document.querySelector('#add-current-page-button').addEventListener('click', asy
         });
 
     } else {
-        // Check if there is an element with saved items
-        if (!document.querySelector('#saved')) {
-            document.querySelector('#saved-links-row').innerHTML = `
-            <h2>Your saved links</h2>
-            <div class="col bg-body-secondary rounded-4 overflow-hidden">
-                <div class="row overflow-y-auto overflow-x-hidden" style="height: 10rem;">
-                    <div id="saved" class="col"></div>
-                </div>
-            </div>`;
-        }
+        const hintForm = document.querySelector('#hint-form');
+        const hintHTML = `
+            <input id="hint-input" class="form-control" type="text" placeholder="Type your hint">
+            <button id="submit-button" class="btn btn-outline-light custom-button">Submit</button>`;
 
-        savedURLs.push(currentURL);
+        hintForm.innerHTML = hintHTML;
+        hintForm.classList.add('mt-3');
 
-        chrome.storage.sync.set({ savedURLs });
+        const hintInput = document.querySelector('#hint-input');
+        hintInput.classList.add('mb-3');
 
-        document.querySelector('#saved').innerHTML = savedURLs.map(item => '<div>' + item.substring(0, 35) + '...</div>').join('');
+        document.querySelector('#submit-button').addEventListener('click', () => {
+            if (hintInput.value) {
+                createHint(currentURL, hintInput.value);
+            } else {
+                // Display an error message
+            }
+        });
     }
 });
