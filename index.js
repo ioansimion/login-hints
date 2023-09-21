@@ -1,7 +1,7 @@
 let hints = (await chrome.storage.sync.get('hints')).hints || [];
 let domains;
 let currentURL = new URL((await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0].url).hostname;
-const buttonContainer = document.querySelector('#button-container');
+const interactions = document.querySelector('#interactions');
 
 function updateDomains() {
     domains = hints.map(item => item.domain);
@@ -35,58 +35,40 @@ function createHint(hint) {
 }
 
 function displayForm() {
-    buttonContainer.innerHTML = '';
-
-    const form = document.querySelector('#hint-form');
-    const formHTML = `
-        <input id="hint-input" class="form-control" type="text" placeholder="Type your hint">
-        <button id="submit-button" class="btn btn-outline-light custom-button">Submit</button>`;
-
-    form.innerHTML = formHTML;
+    interactions.innerHTML = `
+        <input id="hint-input" class="form-control form-control-lg mb-3" type="text" placeholder="Type your hint">
+        <button id="submit-button" class="btn btn-outline-light custom-button">Submit</button>
+        <button id="cancel-button" class="btn btn-outline-light custom-button">Cancel</button>`;
 
     const input = document.querySelector('#hint-input');
-    input.classList.add('mb-3');
     input.focus();
 
     document.querySelector('#submit-button').addEventListener('click', () => {
         if (input.value) {
             createHint(input.value);
 
-            form.innerHTML = '';
-
-            updateButtonContainer();
+            displayAddButton();
         } else {
             // Display an error message
         }
     });
+
+    document.querySelector('#cancel-button').addEventListener('click', displayAddButton);
 }
 
 function displayWarning() {
-    buttonContainer.innerHTML = '';
-
-    const warning = document.querySelector('#warning');
-    const warningHTML = `
+    interactions.innerHTML = `
         <p class="lead">You already saved this page. Continue?</p>
-        <button id="yes-button" class="btn btn-success">Yes</button>
-        <button id="no-button" class="btn btn-danger">No</button>`;
+        <button id="yes-button" class="btn btn-outline-light custom-button">Yes</button>
+        <button id="no-button" class="btn btn-outline-light custom-button">No</button>`;
 
-    warning.innerHTML = warningHTML;
+    document.querySelector('#yes-button').addEventListener('click', displayForm);
 
-    document.querySelector('#yes-button').addEventListener('click', () => {
-        warning.innerHTML = '';
-
-        displayForm();
-    });
-
-    document.querySelector('#no-button').addEventListener('click', () => {
-        warning.innerHTML = '';
-
-        updateButtonContainer();
-    });
+    document.querySelector('#no-button').addEventListener('click', displayAddButton);
 }
 
-function updateButtonContainer() {
-    buttonContainer.innerHTML = `
+function displayAddButton() {
+    interactions.innerHTML = `
         <button id="add-hint-button" class="btn btn-lg btn-outline-light custom-button">
             Add this page
         </button>`;
@@ -107,5 +89,5 @@ function updateButtonContainer() {
 }
 
 updateDomains();
-updateButtonContainer();
+displayAddButton();
 updateSaved();
