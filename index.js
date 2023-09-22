@@ -34,22 +34,33 @@ function createHint(hint) {
     updateSaved();
 }
 
-function displayForm() {
-    interactions.innerHTML = `
-        <input id="hint-input" class="form-control form-control-lg mb-3" type="text" placeholder="Type your hint">
-        <button id="submit-button" class="btn btn-outline-light custom-button">Submit</button>
-        <button id="cancel-button" class="btn btn-outline-light custom-button">Cancel</button>`;
+function displayForm(validity = 'valid') {
+    if (validity === 'valid') {
+        interactions.innerHTML = `
+            <input id="hint-input" class="form-control form-control-lg mb-3" type="text" placeholder="Type your hint">
+            <button id="submit-button" class="btn btn-outline-light custom-button">Submit</button>
+            <button id="cancel-button" class="btn btn-outline-light custom-button">Cancel</button>`;
+
+    } else if (validity === 'invalid') {
+        interactions.innerHTML = `
+            <input id="hint-input" class="form-control form-control-lg is-invalid" type="text" placeholder="Type your hint">
+            <div class="invalid-feedback mb-2">Please provide a hint.</div>
+            <button id="submit-button" class="btn btn-outline-light custom-button">Submit</button>
+            <button id="cancel-button" class="btn btn-outline-light custom-button">Cancel</button>`;
+    }
 
     const input = document.querySelector('#hint-input');
     input.focus();
 
     document.querySelector('#submit-button').addEventListener('click', () => {
         if (input.value) {
+            // If something is typed, create a hint and reset interactions
             createHint(input.value);
 
             displayAddButton();
         } else {
-            // Display an error message
+            // Else display an error message
+            displayForm('invalid');
         }
     });
 
@@ -62,7 +73,9 @@ function displayWarning() {
         <button id="yes-button" class="btn btn-outline-light custom-button">Yes</button>
         <button id="no-button" class="btn btn-outline-light custom-button">No</button>`;
 
-    document.querySelector('#yes-button').addEventListener('click', displayForm);
+    document.querySelector('#yes-button').addEventListener('click', () => {
+        displayForm();
+    });
 
     document.querySelector('#no-button').addEventListener('click', displayAddButton);
 }
