@@ -1,6 +1,6 @@
 let hints = (await chrome.storage.sync.get('hints')).hints || [];
 let domains;
-let currentURL = new URL((await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0].url).hostname;
+let currentURL = new URL((await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0].url).href;
 const interactions = document.querySelector('#interactions');
 
 function updateDomains() {
@@ -17,7 +17,7 @@ function updateSaved() {
             <div class="col bg-body-secondary rounded-4 overflow-hidden">
                 <div class="row overflow-y-auto overflow-x-hidden" style="height: 10rem;">
                     <div class="col">
-                        ${hints.map(item => `<div>${item.domain + ' > ' + item.hint}</div>`).join('')}
+                        ${hints.map(item => `<div>${new URL(item.domain).hostname + ' > ' + item.hint}</div>`).join('')}
                     </div>
                 </div>
             </div>`;

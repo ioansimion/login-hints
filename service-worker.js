@@ -1,19 +1,33 @@
-let contextMenuItem = {
-    'id': 'saveurl',
-    'title': 'Save page',
-    'contexts': ['page']
-};
+(async () => {
+    const activeIcon = { 'path': { '16': 'icons/16.png' } };
+    const grayIcon = { 'path': { '16': 'icons/16-gray.png' } };
 
-chrome.contextMenus.create(contextMenuItem);
+    let hints = (await chrome.storage.sync.get('hints')).hints || [];
+    let domains = hints.map(item => item.domain);
 
-chrome.contextMenus.onClicked.addListener(async clickData => {
-    if (clickData.menuItemId === 'saveurl') {
-        let currentURL = new URL((await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0].url).hostname;
+    async function updateIcon(tabId) {
+        let currentURL = new URL((await chrome.tabs.get(tabId)).url).href;
+        let response = await chrome.tabs.sendMessage(tabId, { todo: 'check-login-page' }).catch(err => {
+            chrome.action.setIcon(grayIcon);
+            console.error(err);
+            return { todo: undefined };
+        });
 
-        let savedURLs = (await chrome.storage.sync.get('savedURLs')).savedURLs || [];
+        if (domains.includes(currentURL) || response.todo === 'go-active') {
+            chrome.action.setIcon(activeIcon);
+            chrome.tabs.sendMessage(tabId, { todo: 'display-on-page' });
+        } else {
+            chrome.action.setIcon(grayIcon);
+        }
 
-        savedURLs.push(currentURL);
-
-        chrome.storage.sync.set({ savedURLs });
+        console.log(tabId, (await chrome.tabs.get(tabId)).url, response);
     }
-});
+
+    chrome.tabs.onActivated.addListener(active => {
+        updateIcon(active.tabId);
+    });
+
+    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+        updateIcon(tabId);
+    });
+})();
